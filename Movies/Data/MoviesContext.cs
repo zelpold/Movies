@@ -15,5 +15,8 @@ namespace Movies.Data
         }
 
         public DbSet<Movies.Models.Movie> Movie { get; set; }
+        public DbSet<Movies.Models.UsersId> UsersMovie { get; set; }
+
     }
+
 }

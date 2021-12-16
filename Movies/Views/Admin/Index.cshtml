@@ -1,0 +1,59 @@
+﻿@model IEnumerable<Movies.Models.User>;
+
+@{
+    ViewData["Title"] = "Список участников!";
+}
+
+<h2>Список участников!</h2>
+
+<form asp-controller = "Admin" asp-action ="Index" method = "get">
+    <p>
+        Никнейм: <input type="text" name ="SearchString"/>
+        <input class="btn-dark" type = "submit" value = "Поиск"/> 
+    </p>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Role)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Role)
+            </td>
+                
+            <td>
+                    @if (item.Role == "Manager")
+                    {
+                       <a asp-action="RemovePolicy" asp-route-id="@item.Id">Remove Policy</a>
+
+                    }
+                    @if(item.Role == null)
+                    {
+                        <a asp-action="AddPolicy" asp-route-id="@item.Id">Add Policy</a>
+                    }
+                </td>
+            <td>
+                    @if (item.Role != "Admin")
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
+                    }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+

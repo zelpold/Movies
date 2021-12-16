@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -23,6 +24,22 @@ namespace Movies.Models
 
         [Display(Name ="Рейтинг")]
         public string? Rating { get; set; }
+        
+        public ICollection<UsersId>? UsersId{ get; set; }
+        
 
+
+    }
+
+
+    public class UsersId
+    {
+        public Guid Id { get; set; }
+        public ICollection<Movie>? Movies{ get; set;}
+
+        public UsersId()
+        {
+            Movies = new List<Movie>();
+        }
     }
 }

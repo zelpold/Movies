@@ -35,14 +35,6 @@ namespace Movies.Controllers
         {
             if (ModelState.IsValid)
             {
-                //var claims = new List<Claim>
-                //{
-                //    new Claim("Demo", "Value")
-                //};
-                //var claimIdentity = new ClaimsIdentity(claims, "Cookie");
-                //var claimPrincipal = new ClaimsPrincipal(claimIdentity);
-                //await HttpContext.SignInAsync("Cookie", claimPrincipal);
-                //return Redirect(model.ReturnUrl);
                 var user = await _userManager.FindByNameAsync(model.UserName);
                 if (user == null)
                 {
@@ -50,23 +42,28 @@ namespace Movies.Controllers
                     return View(model);
                 }
                 var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
-               
+
                 if (result.Succeeded)
                 {
-                    return Redirect(model.ReturnUrl);
+                    if (model.ReturnUrl != null)
+                    {
+                        return Redirect(model.ReturnUrl);
+                    }
+                    else 
+                    { 
+                        return RedirectToAction("Index", "Movies");
+                    }
                 }
                 else
                 {
                     ModelState.AddModelError("", "отказано в доступе");
                 }
-                
-                
             }
             return View(model);
         }
 
         [Authorize(Policy = "Admin")]
-        public  string Admin()
+        public string Admin()
         {
             return "admin panel";
         }
@@ -82,6 +79,43 @@ namespace Movies.Controllers
         {
             await _signInManager.SignOutAsync();
             return Redirect("/Movies/Index");
+        }
+
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByNameAsync(model.UserName);
+                if (user == null)
+                {
+                    user = new User { UserName = model.UserName };
+                    var result = await _userManager.CreateAsync(user, model.Password);
+                    if (result.Succeeded)
+                    {
+                        await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
+                        return RedirectToAction("Index", "Movies");
+                    }
+                    else
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError("", error.Description);
+                        }
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Такой пользователь существует");
+                }
+            }
+            return View(model);
         }
     }
 }
